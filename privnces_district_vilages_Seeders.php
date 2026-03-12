@@ -7,7 +7,7 @@ use App\Models\Province;
 use App\Models\District;
 use App\Models\Village;
 
-class GeoSeeder extends Seeder
+class ProvinceSeeder extends Seeder
 {
     public function run(): void
     {
@@ -7877,22 +7877,35 @@ class GeoSeeder extends Seeder
                 ],
             ];
 
-            foreach ($geo as $provinceData) {
-                $province = Province::firstOrCreate([
-                    'name' => $provinceData['name'],
-                ]);
+           foreach ($geo as $provinceData) {
+                $province = Province::updateOrCreate(
+                    ['name' => $provinceData['name']],
+                    ['name' => $provinceData['name']]
+                );
 
                 foreach ($provinceData['districts'] as $districtData) {
-                    $district = District::firstOrCreate([
-                        'name' => $districtData['name'],
-                        'provinces_id' => $province->id,
-                    ]);
+                    $district = District::updateOrCreate(
+                        [
+                            'province_id' => $province->id,
+                            'name' => $districtData['name'],
+                        ],
+                        [
+                            'province_id' => $province->id,
+                            'name' => $districtData['name'],
+                        ]
+                    );
 
                     foreach ($districtData['villages'] as $villageData) {
-                        Village::firstOrCreate([
-                            'name' => $villageData['name'],
-                            'districts_id' => $district->id,
-                        ]);
+                        Village::updateOrCreate(
+                            [
+                                'district_id' => $district->id,
+                                'name' => $villageData['name'],
+                            ],
+                            [
+                                'district_id' => $district->id,
+                                'name' => $villageData['name'],
+                            ]
+                        );
                     }
                 }
             }
